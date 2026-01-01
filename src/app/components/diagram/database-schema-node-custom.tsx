@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Position, type NodeProps } from "@xyflow/react";
+import { Position } from "@xyflow/react";
 import { LabeledHandle } from "@/components/labeled-handle";
 import {
   DatabaseSchemaNode,
@@ -21,11 +21,26 @@ export interface DatabaseSchemaNodeData {
   }>;
 }
 
+interface DatabaseSchemaNodeProps {
+  data: DatabaseSchemaNodeData;
+  selected?: boolean;
+}
+
 export const DatabaseSchemaNodeCustom = memo(
-  ({ data }: NodeProps<any>) => {
+  ({ data, selected }: DatabaseSchemaNodeProps) => {
     return (
-      <DatabaseSchemaNode className="p-0">
-        <DatabaseSchemaNodeHeader>{data.label}</DatabaseSchemaNodeHeader>
+      <DatabaseSchemaNode
+        className={`p-0 cursor-pointer transition-all ${
+          selected
+            ? "ring-1 ring-muted-foreground"
+            : "hover:ring-1 hover:ring-muted-foreground"
+        }`}
+      >
+        <DatabaseSchemaNodeHeader
+          className={selected ? "bg-primary/10" : undefined}
+        >
+          {data.label}
+        </DatabaseSchemaNodeHeader>
         <DatabaseSchemaNodeBody>
           {data.schema.map((entry: any) => (
             <DatabaseSchemaTableRow key={entry.title}>
@@ -39,7 +54,6 @@ export const DatabaseSchemaNodeCustom = memo(
               </DatabaseSchemaTableCell>
               <DatabaseSchemaTableCell className="pr-0 font-thin">
                 <div className="flex items-center justify-between">
-                  {/*<span className="text-xs">{entry.type}</span>*/}
                   <div className="flex gap-1">
                     {entry.primaryKey && (
                       <span className="text-xs text-yellow-600">PK</span>
@@ -47,7 +61,7 @@ export const DatabaseSchemaNodeCustom = memo(
                     {entry.unique && (
                       <span className="text-xs text-green-600">U</span>
                     )}
-                    {!entry.nullable && (
+                    {entry.nullable === false && (
                       <span className="text-xs text-red-600">NN</span>
                     )}
                   </div>

@@ -1,6 +1,6 @@
 import { type FC } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut, FileText } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,6 +27,11 @@ export const AppSidebar: FC = () => {
       title: "Dashboard",
       icon: LayoutDashboard,
       url: "/",
+    },
+    {
+      title: "Diagrams",
+      icon: FileText,
+      url: "/diagrams",
     },
   ];
 

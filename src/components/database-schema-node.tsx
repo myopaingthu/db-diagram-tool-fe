@@ -13,13 +13,17 @@ import { TableBody, TableRow, TableCell } from "@/components/ui/table";
  */
 export type DatabaseSchemaNodeHeaderProps = {
   children?: ReactNode;
+  className?: string;
 };
 
 export const DatabaseSchemaNodeHeader = ({
   children,
+  className,
 }: DatabaseSchemaNodeHeaderProps) => {
   return (
-    <BaseNodeHeader className="rounded-tl-md rounded-tr-md bg-secondary p-2 text-center text-sm text-muted-foreground">
+    <BaseNodeHeader
+      className={`rounded-tl-md rounded-tr-md bg-secondary p-2 text-center text-sm text-muted-foreground ${className || ""}`}
+    >
       <h2>{children}</h2>
     </BaseNodeHeader>
   );

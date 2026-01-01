@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./auth.guard";
 import { AppLayout } from "@/app/components";
 import { DashboardPage } from "@/app/containers/dashboard";
 import { EditorPage } from "@/app/containers/editor";
+import { DiagramsPage } from "@/app/containers/diagrams";
 
 export const AppRoutes = () => {
   return (
@@ -13,6 +14,7 @@ export const AppRoutes = () => {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/diagrams" element={<DiagramsPage />} />
           <Route path="/diagram/:id?" element={<EditorPage />} />
         </Route>
       </Route>

@@ -1,5 +1,7 @@
 import type { SchemaAST } from "./schema.types";
 
+export type DiagramStatus = "idle" | "parsing" | "error" | "editing" | "saving";
+
 export interface Layout {
   nodes: Record<string, { x: number; y: number }>;
   zoom: number;

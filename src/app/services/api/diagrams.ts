@@ -1,21 +1,27 @@
 import { Base } from "./base";
-import type { ApiResponse } from "@/app/types";
+import type { ApiResponse, DiagramStatus } from "@/app/types";
+import type { SchemaAST, ParseError } from "@/app/types";
+import type { Node, Edge } from "@xyflow/react";
 
 export interface Diagram {
   _id: string;
-  userId: string;
-  name: string;
-  description: string;
+  userId?: string;
+  name?: string;
+  description?: string;
   dbmlText: string;
-  status: "editing" | "idle" | "saving";
-  validationErrors: any[];
-  setting: {
+  status: DiagramStatus;
+  validationErrors?: any[];
+  errors?: ParseError[];
+  ast?: SchemaAST;
+  nodes?: Node[];
+  edges?: Edge[];
+  setting?: {
     modelJson: string;
     layout: any;
     preferences: any;
   };
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateDiagramDto {
@@ -27,7 +33,7 @@ export interface UpdateDiagramDto {
   name?: string;
   description?: string;
   dbmlText?: string;
-  status?: "editing" | "idle" | "saving";
+  status?: DiagramStatus;
 }
 
 export class Diagrams extends Base {
@@ -47,8 +53,30 @@ export class Diagrams extends Base {
     return this.http.put(`/api/core/diagrams/${id}`, data);
   }
 
-  list(): Promise<ApiResponse<Diagram[]>> {
-    return this.http.get("/api/core/diagrams");
+  list(page?: number, limit?: number): Promise<ApiResponse<{ diagrams: Diagram[]; total: number; page: number; limit: number; totalPages: number }>> {
+    const params = new URLSearchParams();
+    if (page !== undefined) params.append("page", page.toString());
+    if (limit !== undefined) params.append("limit", limit.toString());
+    const queryString = params.toString();
+    return this.http.get(`/api/core/diagrams${queryString ? `?${queryString}` : ""}`);
+  }
+
+  sync(
+    id: string | null | undefined,
+    payload: {
+      dbmlText?: string;
+      ast?: SchemaAST;
+      nodes?: Node[];
+      edges?: Edge[];
+      errors?: ParseError[];
+      status?: DiagramStatus;
+    }
+  ): Promise<ApiResponse<Diagram>> {
+    if (id) {
+      return this.http.put(`/api/core/diagrams/sync/${id}`, payload);
+    } else {
+      return this.http.post("/api/core/diagrams/sync", payload);
+    }
   }
 }
 
