@@ -1,8 +1,8 @@
-import { type FC, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./app-sidebar";
-import { CheckCircle2, Loader2, AlertCircle, Edit2, Save } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Edit2 } from "lucide-react";
 import { useSchemaStore, useDiagramStore } from "@/app/store";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
@@ -52,7 +52,7 @@ const HeaderContent: FC = () => {
         };
       case "saving":
         return {
-          icon: Save,
+          icon: Loader2,
           color: "text-yellow-600",
           label: "Saving",
         };
@@ -107,6 +107,7 @@ const HeaderContent: FC = () => {
 
   const statusConfig = getStatusConfig(status);
   const StatusIcon = statusConfig.icon;
+  const showStatusLabel = (status === "parsing" || status === "saving");
 
   return (
     <Popover onOpenChange={handleOpenChange}>
@@ -115,7 +116,7 @@ const HeaderContent: FC = () => {
           <span className="font-medium">
             {name || "Untitled Diagram"}
           </span>
-          <StatusIcon className={`h-4 w-4 ${statusConfig.color} ${status === "parsing" ? "animate-spin" : ""}`} />
+          <StatusIcon className={`h-4 w-4 ${statusConfig.color} ${showStatusLabel ? "animate-spin" : ""}`} />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-80" align="end">
@@ -171,4 +172,3 @@ export const AppLayout: FC = () => {
     </SidebarProvider>
   );
 };
-

@@ -1,6 +1,7 @@
 import { Base } from "./base";
 import type { ApiResponse, DiagramStatus } from "@/app/types";
 import type { SchemaAST, ParseError } from "@/app/types";
+import type { AiChatMessage } from "@/app/types";
 import type { Node, Edge } from "@xyflow/react";
 
 export interface Diagram {
@@ -78,5 +79,20 @@ export class Diagrams extends Base {
       return this.http.post("/api/core/diagrams/sync", payload);
     }
   }
-}
 
+  getAiMessages(
+    id: string,
+    limit?: number
+  ): Promise<ApiResponse<AiChatMessage[]>> {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    const query = params.toString();
+    return this.http.get(
+      `/api/core/diagrams/${id}/ai/messages${query ? `?${query}` : ""}`
+    );
+  }
+
+  clearAiMessages(id: string): Promise<ApiResponse<boolean>> {
+    return this.http.delete(`/api/core/diagrams/${id}/ai/messages`);
+  }
+}

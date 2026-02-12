@@ -5,13 +5,13 @@ import { useSchemaStore, useDiagramStore, useEditorPanelStore } from "@/app/stor
 import { TextEditor } from "./text-editor";
 import { DiagramPanel } from "./diagram-panel";
 import { NodePropertyPanel } from "@/app/components/editor/node-property-panel";
+import { AiChatPanel } from "@/app/components/editor/ai-chat-panel";
 import { SyncProvider, useSyncContext } from "@/app/contexts/sync.context";
 import { astToNodes, astToEdges } from "@/app/utils/ast-to-flow";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSidebar } from "@/components/ui/sidebar";
-import { LoadingOverlay } from "@/app/components";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -23,7 +23,7 @@ const EditorPageContent: FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const api = useApi();
-  const { setDbmlText, setAst, setErrors, setStatus, setName, setDescription, status, reset: resetSchema } = useSchemaStore();
+  const { setDbmlText, setAst, setErrors, setStatus, setName, setDescription, reset: resetSchema } = useSchemaStore();
   const { setDiagramId, setNodes, setEdges, reset: resetDiagram } =
     useDiagramStore();
   const { activeTab, setActiveTab, reset: resetEditorPanel } = useEditorPanelStore();
@@ -31,9 +31,6 @@ const EditorPageContent: FC = () => {
   const { parseDbml } = useSyncContext();
   const { setOpen: setSidebarOpen } = useSidebar();
   
-  const isLoading = status === "parsing" || status === "saving";
-  const loadingText = status === "parsing" ? "Parsing schema..." : status === "saving" ? "Saving..." : "Loading...";
-
   useEffect(() => {
     setSidebarOpen(false);
   }, []);
@@ -120,24 +117,29 @@ const EditorPageContent: FC = () => {
 
   return (
     <div className="relative flex h-full w-full max-h-[calc(100vh-(var(--spacing)*8+var(--spacing)*16+var(--spacing)*4)))]">
-      <LoadingOverlay isLoading={isLoading} text={loadingText} />
       <ResizablePanelGroup direction="horizontal" className="gap-2">
         <ResizablePanel defaultSize={33} minSize={20} maxSize={60}>
           <Card className="h-full overflow-hidden">
             <Tabs
               value={activeTab}
-              onValueChange={(value) => setActiveTab(value as "dbml" | "properties")}
+              onValueChange={(value) =>
+                setActiveTab(value as "dbml" | "properties" | "ai")
+              }
               className="h-full flex flex-col"
             >
-              <TabsList className="w-full grid grid-cols-2 shrink-0">
+              <TabsList className="w-full grid grid-cols-3 shrink-0">
                 <TabsTrigger value="dbml">DBML</TabsTrigger>
                 <TabsTrigger value="properties">Properties</TabsTrigger>
+                <TabsTrigger value="ai">AI Chat</TabsTrigger>
               </TabsList>
               <TabsContent value="dbml" className="flex-1 overflow-hidden m-0">
                 <TextEditor onBlur={parseDbml} />
               </TabsContent>
               <TabsContent value="properties" className="flex-1 overflow-hidden m-0 min-h-0">
                 <NodePropertyPanel />
+              </TabsContent>
+              <TabsContent value="ai" className="flex-1 overflow-hidden m-0 min-h-0">
+                <AiChatPanel />
               </TabsContent>
             </Tabs>
           </Card>
@@ -158,4 +160,3 @@ export const EditorPage: FC = () => {
     </SyncProvider>
   );
 };
-

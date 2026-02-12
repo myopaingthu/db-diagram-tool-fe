@@ -71,7 +71,7 @@ export const TextEditor: FC<TextEditorProps> = ({ onBlur }) => {
 
   return (
     <div className="h-full w-full">
-      <div ref={editorRef} className="h-full w-full" />
+      <div ref={editorRef} className="h-full w-full overflow-y-auto" />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type TabValue = "dbml" | "properties";
+type TabValue = "dbml" | "properties" | "ai";
 
 interface EditorPanelState {
   activeTab: TabValue;
@@ -38,4 +38,3 @@ export const useEditorPanelStore = create<EditorPanelState>((set) => ({
       selectedNodeId: null,
     }),
 }));
-
