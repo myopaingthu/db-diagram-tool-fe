@@ -202,6 +202,28 @@ export const useValidatedDiagramEdit = () => {
     [storeRemoveTable, savePreviousState, revertToPrevious, syncAstToBackend]
   );
 
+  // For fields that change on every keystroke (table/column name inputs): call
+  // beginFieldEdit on focus to checkpoint state, let onChange write straight to
+  // the store (no validation/sync per keystroke), then commitFieldEdit on blur
+  // to validate and sync once, or revert the whole edit session if invalid.
+  const beginFieldEdit = useCallback(() => {
+    savePreviousState();
+  }, [savePreviousState]);
+
+  const commitFieldEdit = useCallback(() => {
+    const { nodes: updatedNodes, edges: updatedEdges } = useDiagramStore.getState();
+    const ast = flowToAst(updatedNodes, updatedEdges);
+    const validation = validateAst(ast);
+
+    if (!validation.valid) {
+      toast.error(validation.errors[0]?.message || "Validation failed");
+      revertToPrevious();
+      return;
+    }
+
+    syncAstToBackend(ast);
+  }, [revertToPrevious, syncAstToBackend]);
+
   return {
     addTable,
     updateTableName,
@@ -212,6 +234,8 @@ export const useValidatedDiagramEdit = () => {
     removeRelationship,
     updateRelationshipType,
     removeTable,
+    beginFieldEdit,
+    commitFieldEdit,
   };
 };
 

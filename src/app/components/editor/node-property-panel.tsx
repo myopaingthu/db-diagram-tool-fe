@@ -55,15 +55,18 @@ export const NodePropertyPanel: FC = () => {
     nodes,
     edges,
     getNodeById,
+    updateTableName: setTableNameDraft,
+    updateColumn: setColumnDraft,
   } = useDiagramStore();
   const {
-    updateTableName,
     addColumn,
     removeColumn,
     updateColumn,
     removeTable,
     addRelationship,
     removeRelationship,
+    beginFieldEdit,
+    commitFieldEdit,
   } = useValidatedDiagramEdit();
 
   const [deleteTableOpen, setDeleteTableOpen] = useState(false);
@@ -102,11 +105,16 @@ export const NodePropertyPanel: FC = () => {
     (e) => e.source === selectedNodeId || e.target === selectedNodeId
   );
 
-  const handleTableNameChange = (value: string) => {
+  const handleTableNameDraft = (value: string) => {
     if (selectedNodeId) {
-      updateTableName(selectedNodeId, value);
+      setTableNameDraft(selectedNodeId, value);
     }
-    console.log("Table name updated:", { tableId: selectedNodeId, name: value });
+  };
+
+  const handleColumnDraft = (columnTitle: string, updates: Partial<ColumnData>) => {
+    if (selectedNodeId) {
+      setColumnDraft(selectedNodeId, columnTitle, updates);
+    }
   };
 
   const handleAddColumn = () => {
@@ -256,7 +264,9 @@ export const NodePropertyPanel: FC = () => {
             <Input
               id="table-name"
               value={data.label}
-              onChange={(e) => handleTableNameChange(e.target.value)}
+              onFocus={beginFieldEdit}
+              onChange={(e) => handleTableNameDraft(e.target.value)}
+              onBlur={commitFieldEdit}
               placeholder="Enter table name"
             />
           </div>
@@ -270,7 +280,7 @@ export const NodePropertyPanel: FC = () => {
                 <div className="space-y-3">
                   {data.schema.map((column, index) => (
                     <div
-                      key={column.title}
+                      key={index}
                       className="rounded border p-2 space-y-2"
                     >
                       <div className="flex items-center justify-between">
@@ -294,9 +304,11 @@ export const NodePropertyPanel: FC = () => {
                         <Label className="text-xs">Name</Label>
                         <Input
                           value={column.title}
+                          onFocus={beginFieldEdit}
                           onChange={(e) =>
-                            handleUpdateColumn(column.title, { title: e.target.value })
+                            handleColumnDraft(column.title, { title: e.target.value })
                           }
+                          onBlur={commitFieldEdit}
                           className="h-8 text-sm"
                         />
                       </div>
